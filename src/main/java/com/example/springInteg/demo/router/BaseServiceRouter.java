@@ -4,6 +4,9 @@ import com.example.springInteg.demo.config.HttpOutboundGatewayConfig;
 import com.example.springInteg.demo.config.VibeAdapterConfig;
 import com.example.springInteg.demo.model.eai.ProductOrderCreate;
 import com.example.springInteg.demo.model.target.CCSResponseModel;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,46 +31,27 @@ public class BaseServiceRouter {
     private static org.apache.logging.log4j.Logger logger = LogManager.getLogger(BaseServiceRouter.class);
 
     @Autowired
-    private VibeAdapterConfig.PublishReservationGateway publishReservationGateway;
-/*
-    @Autowired
-    private HttpOutboundGatewayConfig.GetReservationGateway getReservationGateway;
+    private VibeAdapterConfig.VibeGateway vibeGateway;
 
-
- */
 
     @ServiceActivator(inputChannel = "registrationRequest")
-    public void register(@Payload ProductOrderCreate
+    public String register(@Payload ProductOrderCreate
             productOrderCreate) {
 
-        System.out.println(productOrderCreate);
-        System.out.println(productOrderCreate.toString());
-        System.out.println(productOrderCreate);
-/*
-        HttpRequestExecutingMessageHandler handler = new HttpRequestExecutingMessageHandler(
-                "http://localhost:9090/vibe");
 
-
- */
-        ProductOrderCreate reservation = productOrderCreate;
-
-        logger.info("Received reservation from channel: {}, publishing it to the reservation web service", reservation);
-        publishReservationGateway.publishReservation(MessageBuilder.withPayload(reservation)
+        logger.info("Received eaiRequest from channel: {}, publishing it to the vibe web service", productOrderCreate);
+        vibeGateway.postRequest(MessageBuilder.withPayload(productOrderCreate)
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .build());
 
-        /*
-        ProductOrderCreate serviceReservation = getReservationGateway.getReservation(reservation.getId());
-        logger.info("Reservation from web service: {}", serviceReservation);
+        return null;
+    }
 
+    @ServiceActivator(inputChannel = "getVibeResponse")
+    public String productMapper(@Payload CCSResponseModel arda) {
+        System.out.println("burada");
+        System.out.println(arda);
 
-
-        handler.setExpectReply(true);
-        handler.setExpectedResponseType(CCSResponseModel.class);
-        handler.setOutputChannelName("vibeResponse");
-
-        */
-
-
+        return null;
     }
 }

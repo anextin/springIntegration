@@ -1,6 +1,10 @@
 package com.example.springInteg.demo.config;
 
 import com.example.springInteg.demo.model.eai.ProductOrderCreate;
+import com.example.springInteg.demo.model.target.CCSResponseModel;
+import com.example.springInteg.demo.router.BaseServiceRouter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +19,7 @@ import org.springframework.messaging.MessageHandler;
 @Configuration
 public class VibeAdapterConfig {
 
+    private static final Logger LOG = LoggerFactory.getLogger(BaseServiceRouter.class);
     @Bean
     public MessageChannel toReservationServiceChannel() {
         return new DirectChannel();
@@ -27,15 +32,17 @@ public class VibeAdapterConfig {
         HttpRequestExecutingMessageHandler messageHandler = new HttpRequestExecutingMessageHandler(
                 "http://localhost:9093/vibe");
         messageHandler.setHttpMethod(HttpMethod.POST);
-
-        // Setup our reply configuration - we do not expect a reply
-        messageHandler.setExpectReply(false);
-
+        messageHandler.setExpectReply(true);
+        LOG.warn("messageHandler 32");
+       // System.out.println("messageHandler 32");
+        messageHandler.setExpectedResponseType(CCSResponseModel.class);
+        messageHandler.setOutputChannelName("getVibeResponse");
+        LOG.warn("messageHandler 40");
         return messageHandler;
     }
 
     @MessagingGateway(defaultRequestChannel = "toReservationServiceChannel")
-    public interface PublishReservationGateway {
-        void publishReservation(Message<ProductOrderCreate> message);
+    public interface VibeGateway {
+        void postRequest(Message<ProductOrderCreate> message);
     }
 }

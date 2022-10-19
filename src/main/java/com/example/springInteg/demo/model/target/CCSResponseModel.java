@@ -18,7 +18,8 @@ import java.util.Map;
 @Generated("jsonschema2pojo")
 public class CCSResponseModel {
 
-
+    public CCSResponseModel() {
+    }
 
     @JsonProperty("resultCode")
     private String resultCode;
