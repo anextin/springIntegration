@@ -1,6 +1,8 @@
 package com.example.springInteg.demo.router;
 
 import com.example.springInteg.demo.config.PMAdapterConfig;
+import com.example.springInteg.demo.config.PMAggregatorChannelGateway;
+import com.example.springInteg.demo.config.PMChannellGateway;
 import com.example.springInteg.demo.model.eai.ProductOrderCreate;
 import com.example.springInteg.demo.model.target.CCSResponseModel;
 import org.apache.logging.log4j.LogManager;
@@ -27,25 +29,41 @@ public class BaseServiceRouter {
     @Autowired
     private PMAdapterConfig.PMGateway pmGateway;
 
+    @Autowired
+    private PMChannellGateway pmChannellGateway;
+
+    @Autowired
+    private PMAggregatorChannelGateway pmAggregatorChannelGateway;
+
 
     @ServiceActivator(inputChannel = "registrationRequest")
     public String register(@Payload ProductOrderCreate
             productOrderCreate) {
 
-
+      //  pmChannellGateway.pmRequest(productOrderCreate);
         logger.info("Received eaiRequest from channel: {}, publishing it to the vibe web service", productOrderCreate);
+        /*
         pmGateway.postRequest(MessageBuilder.withPayload(productOrderCreate)
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .build());
+         */
+        pmChannellGateway.pmRequest(productOrderCreate);
+        return null;
+    }
+
+    @ServiceActivator(inputChannel = "ccsChannel")
+    public String productMapper(@Payload CCSResponseModel ccsResponseModel) {
+        System.out.println("burada");
+        System.out.println(ccsResponseModel);
+
+        pmAggregatorChannelGateway.aggregateRequest(ccsResponseModel);
 
         return null;
     }
 
-    @ServiceActivator(inputChannel = "getPmResponse")
-    public String productMapper(@Payload CCSResponseModel arda) {
-        System.out.println("burada");
-        System.out.println(arda);
+    @ServiceActivator(inputChannel = "aggregationCompletedChannel")
+    public void handleCompletedGroupReservation(ProductOrderCreate productOrderCreate) {
+        System.out.println(productOrderCreate);
 
-        return null;
     }
 }

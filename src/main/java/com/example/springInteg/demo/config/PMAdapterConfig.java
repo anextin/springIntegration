@@ -35,8 +35,9 @@ public class PMAdapterConfig {
         messageHandler.setExpectReply(true);
         LOG.warn("messageHandler 32");
        // System.out.println("messageHandler 32");
+        String arda = "";
         messageHandler.setExpectedResponseType(CCSResponseModel.class);
-        messageHandler.setOutputChannelName("getPmResponse");
+        messageHandler.setOutputChannelName("ccsChannel");
         LOG.warn("messageHandler 40");
         return messageHandler;
     }
