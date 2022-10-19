@@ -17,16 +17,16 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
 @Configuration
-public class VibeAdapterConfig {
+public class PMAdapterConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseServiceRouter.class);
     @Bean
-    public MessageChannel toReservationServiceChannel() {
+    public MessageChannel toProductMapperChannel() {
         return new DirectChannel();
     }
 
     @Bean
-    @ServiceActivator(inputChannel = "toReservationServiceChannel")
+    @ServiceActivator(inputChannel = "toProductMapperChannel")
     public MessageHandler postReservationToService() {
         // Create a new HttpRequestExecutingMessageHandler
         HttpRequestExecutingMessageHandler messageHandler = new HttpRequestExecutingMessageHandler(
@@ -36,13 +36,13 @@ public class VibeAdapterConfig {
         LOG.warn("messageHandler 32");
        // System.out.println("messageHandler 32");
         messageHandler.setExpectedResponseType(CCSResponseModel.class);
-        messageHandler.setOutputChannelName("getVibeResponse");
+        messageHandler.setOutputChannelName("getPmResponse");
         LOG.warn("messageHandler 40");
         return messageHandler;
     }
 
-    @MessagingGateway(defaultRequestChannel = "toReservationServiceChannel")
-    public interface VibeGateway {
+    @MessagingGateway(defaultRequestChannel = "toProductMapperChannel")
+    public interface PMGateway {
         void postRequest(Message<ProductOrderCreate> message);
     }
 }
